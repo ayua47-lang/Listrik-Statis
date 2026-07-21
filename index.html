@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pembelajaran Interaktif: Listrik Statis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            overflow: hidden; /* App-like feel */
+            user-select: none;
+        }
+        
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(20px);
+        }
+        
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Scrollbar styling */
+        .content-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-area::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        .content-area::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .content-area::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Drag and Drop classes */
+        .draggable { cursor: grab; }
+        .draggable:active { cursor: grabbing; }
+        .dropzone.drag-over {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
+        
+        /* Floating animation for cover */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.8); }
+        }
+        .btn-glow { animation: pulse-glow 2s infinite; }
+
+        /* Simulation animations */
+        .charge-move {
+            transition: all 1s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-800 h-screen w-full flex flex-col relative" onload="initApp()">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Header Navigation -->
+    <header class="fixed top-0 w-full h-14 bg-white/90 backdrop-blur-md shadow-sm z-40 flex justify-between items-center px-4 md:px-6 hidden" id="main-header">
+        <div class="flex items-center gap-3">
+            <button onclick="goToSlide(1)" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center transition-colors" title="Menu Utama">
+                <i class="fas fa-home"></i>
+            </button>
+            <h1 class="font-bold text-blue-900 text-lg md:text-xl hidden md:block">IPA KELAS 9: Listrik Statis</h1>
+        </div>
+        <button onclick="toggleFullscreen()" class="w-10 h-10 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors" title="Layar Penuh">
+            <i class="fas fa-expand" id="fullscreen-icon"></i>
+        </button>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 w-full h-full relative" id="slides-container">
+        
+        <!-- Slide 0: Cover -->
+        <div class="slide active flex-col items-center justify-center h-full w-full bg-gradient-to-br from-blue-900 to-indigo-800 text-white" id="slide-0">
+            <div class="text-center px-4">
+                <div class="mb-6 animate-float inline-block">
+                    <!-- SVG Lightning Atom -->
+                    <svg width="150" height="150" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="40" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4" class="animate-[spin_10s_linear_infinite]"/>
+                        <circle cx="50" cy="50" r="30" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4 4" class="animate-[spin_8s_linear_infinite_reverse]"/>
+                        <path d="M55 25 L40 50 L50 50 L45 75 L60 50 L50 50 Z" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+                        <circle cx="50" cy="20" r="6" fill="#ef4444"/> <!-- Proton -->
+                        <circle cx="20" cy="50" r="6" fill="#3b82f6"/> <!-- Electron -->
+                        <circle cx="80" cy="50" r="6" fill="#3b82f6"/> <!-- Electron -->
+                    </svg>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight drop-shadow-lg text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500">LISTRIK STATIS</h1>
+                <p class="text-xl md:text-2xl font-light mb-2 text-blue-100">Ilmu Pengetahuan Alam - Kelas 9 SMP</p>
+                <div class="w-24 h-1 bg-yellow-400 mx-auto my-6 rounded-full"></div>
+                <p class="text-md mb-10 text-slate-300">Oleh: Ayu Made Yulia Dewi Antini, S.Pd</p>
+                
+                <button onclick="goToSlide(1)" class="btn-glow px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-blue-900 font-bold rounded-full text-xl transition-all transform hover:scale-105 shadow-xl flex items-center gap-3 mx-auto">
+                    Mulai Belajar <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Slide 1: Menu -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-1">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-blue-900 mb-8 mt-4">Menu Utama</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto w-full content-area overflow-y-auto h-full pb-10">
+                <!-- Menu Items -->
+                <button onclick="goToSlide(2)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-blue-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fas fa-bullseye"></i></div>
+                    <h3 class="font-bold text-slate-800">Tujuan Pembelajaran</h3>
+                </button>
+                <button onclick="goToSlide(3)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-green-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fas fa-project-diagram"></i></div>
+                    <h3 class="font-bold text-slate-800">Peta Konsep</h3>
+                </button>
+                <button onclick="goToSlide(4)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-yellow-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fas fa-book-open"></i></div>
+                    <h3 class="font-bold text-slate-800">Materi Inti</h3>
+                </button>
+                <button onclick="goToSlide(7)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-red-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fab fa-youtube"></i></div>
+                    <h3 class="font-bold text-slate-800">Video Pembelajaran</h3>
+                </button>
+                <button onclick="goToSlide(8)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-purple-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fas fa-flask"></i></div>
+                    <h3 class="font-bold text-slate-800">Simulasi Interaktif</h3>
+                </button>
+                <button onclick="goToSlide(9)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-orange-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fas fa-gamepad"></i></div>
+                    <h3 class="font-bold text-slate-800">Game Edukasi</h3>
+                </button>
+                <button onclick="goToSlide(13)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-indigo-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fas fa-question-circle"></i></div>
+                    <h3 class="font-bold text-slate-800">Kuis Interaktif</h3>
+                </button>
+                <button onclick="goToSlide(14)" class="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all border-b-4 border-teal-500 flex flex-col items-center text-center gap-4 group">
+                    <div class="w-16 h-16 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform"><i class="fas fa-clipboard-list"></i></div>
+                    <h3 class="font-bold text-slate-800">Rangkuman</h3>
+                </button>
+            </div>
+        </div>
+
+        <!-- Slide 2: Tujuan Pembelajaran -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-2">
+            <div class="max-w-4xl mx-auto w-full content-area overflow-y-auto h-full pr-2">
+                <div class="flex items-center gap-4 mb-8 border-b-2 border-blue-200 pb-4">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center text-2xl"><i class="fas fa-bullseye"></i></div>
+                    <h2 class="text-3xl font-bold text-blue-900">Tujuan Pembelajaran</h2>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
+                    <p class="text-lg text-slate-600 mb-6 border-l-4 border-yellow-400 pl-4">Sesuai dengan <strong>Kurikulum Merdeka</strong>, setelah mempelajari materi ini peserta didik diharapkan mampu:</p>
+                    
+                    <ul class="space-y-6">
+                        <li class="flex gap-4 items-start">
+                            <div class="w-10 h-10 shrink-0 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg">1</div>
+                            <div class="pt-1">
+                                <h3 class="font-bold text-lg text-slate-800">Memahami Konsep Dasar</h3>
+                                <p class="text-slate-600 mt-1">Menjelaskan konsep dasar muatan listrik (positif dan negatif) serta interaksi tarik-menarik dan tolak-menolak antar muatan.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4 items-start">
+                            <div class="w-10 h-10 shrink-0 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg">2</div>
+                            <div class="pt-1">
+                                <h3 class="font-bold text-lg text-slate-800">Menganalisis Fenomena Alam</h3>
+                                <p class="text-slate-600 mt-1">Menganalisis peristiwa kelistrikan statis dalam kehidupan sehari-hari, seperti terjadinya petir dan proses penggosokan benda.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4 items-start">
+                            <div class="w-10 h-10 shrink-0 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-lg">3</div>
+                            <div class="pt-1">
+                                <h3 class="font-bold text-lg text-slate-800">Hukum Coulomb</h3>
+                                <p class="text-slate-600 mt-1">Menganalisis faktor-faktor yang mempengaruhi besar gaya Coulomb (gaya listrik) antara dua muatan listrik.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Peta Konsep -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-3">
+            <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full flex flex-col items-center">
+                <h2 class="text-3xl font-bold text-blue-900 mb-8 self-start flex items-center gap-3"><i class="fas fa-project-diagram text-green-500"></i> Peta Konsep</h2>
+                
+                <div class="relative w-full max-w-3xl flex-1 flex flex-col items-center justify-center min-h-[400px]">
+                    <!-- Mindmap Container -->
+                    <div class="bg-blue-600 text-white font-bold text-xl px-8 py-4 rounded-xl shadow-lg z-10 relative mb-12">
+                        LISTRIK STATIS
+                        <!-- Lines -->
+                        <div class="absolute h-12 w-1 bg-slate-300 -bottom-12 left-1/2 transform -translate-x-1/2"></div>
+                        <div class="absolute h-1 w-[80%] bg-slate-300 -bottom-12 left-[10%]"></div>
+                        <!-- Drop lines -->
+                        <div class="absolute h-8 w-1 bg-slate-300 -bottom-20 left-[10%]"></div>
+                        <div class="absolute h-8 w-1 bg-slate-300 -bottom-20 left-1/2 transform -translate-x-1/2"></div>
+                        <div class="absolute h-8 w-1 bg-slate-300 -bottom-20 right-[10%]"></div>
+                    </div>
+                    
+                    <div class="flex w-full justify-between px-4 md:px-0 relative z-10 mt-8">
+                        <div class="bg-white border-2 border-green-500 text-slate-800 font-bold px-4 py-3 rounded-lg shadow-md w-[30%] text-center text-sm md:text-base">
+                            Muatan Listrik
+                            <div class="text-xs font-normal text-slate-500 mt-2 block">- Positif (Proton)<br>- Negatif (Elektron)</div>
+                        </div>
+                        <div class="bg-white border-2 border-yellow-500 text-slate-800 font-bold px-4 py-3 rounded-lg shadow-md w-[30%] text-center text-sm md:text-base">
+                            Hukum Coulomb
+                            <div class="text-xs font-normal text-slate-500 mt-2 block">Gaya Tarik / Tolak antar muatan</div>
+                        </div>
+                        <div class="bg-white border-2 border-red-500 text-slate-800 font-bold px-4 py-3 rounded-lg shadow-md w-[30%] text-center text-sm md:text-base">
+                            Penerapan
+                            <div class="text-xs font-normal text-slate-500 mt-2 block">- Petir & Penangkalnya<br>- Elektroskop</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Materi 1 - Muatan Listrik -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-4">
+             <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold tracking-wide">Materi 1 / 3</span>
+                </div>
+                <h2 class="text-3xl font-bold text-blue-900 mb-6">Muatan Listrik & Struktur Atom</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <div>
+                        <p class="text-slate-700 text-lg leading-relaxed mb-4">
+                            Semua benda tersusun dari <strong>atom</strong>. Di dalam atom terdapat partikel sub-atomik:
+                        </p>
+                        <ul class="space-y-3 mb-6 text-slate-700">
+                            <li class="flex gap-2 items-center"><div class="w-3 h-3 rounded-full bg-red-500"></div> <strong>Proton:</strong> Bermuatan positif (+) berada di inti atom.</li>
+                            <li class="flex gap-2 items-center"><div class="w-3 h-3 rounded-full bg-blue-500"></div> <strong>Elektron:</strong> Bermuatan negatif (-) berputar mengelilingi inti.</li>
+                            <li class="flex gap-2 items-center"><div class="w-3 h-3 rounded-full bg-gray-400"></div> <strong>Neutron:</strong> Tidak bermuatan (netral).</li>
+                        </ul>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r">
+                            <h4 class="font-bold text-yellow-800 mb-1">Contoh Sehari-hari:</h4>
+                            <p class="text-sm text-yellow-900">Pernahkah rambutmu berdiri setelah membuka baju wol atau kaos? Itu terjadi karena perpindahan <strong>elektron</strong> akibat gesekan, membuat tubuhmu dan baju memiliki muatan listrik statis!</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <svg width="250" height="250" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Atom Model -->
+                            <ellipse cx="100" cy="100" rx="40" ry="90" fill="none" stroke="#cbd5e1" stroke-width="2" transform="rotate(45 100 100)"/>
+                            <ellipse cx="100" cy="100" rx="40" ry="90" fill="none" stroke="#cbd5e1" stroke-width="2" transform="rotate(-45 100 100)"/>
+                            <ellipse cx="100" cy="100" rx="90" ry="40" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+                            
+                            <!-- Nucleus -->
+                            <circle cx="95" cy="95" r="10" fill="#ef4444"/>
+                            <circle cx="105" cy="105" r="10" fill="#ef4444"/>
+                            <circle cx="95" cy="105" r="10" fill="#9ca3af"/>
+                            <circle cx="105" cy="95" r="10" fill="#9ca3af"/>
+                            
+                            <!-- Electrons -->
+                            <circle cx="100" cy="10" r="8" fill="#3b82f6"/>
+                            <text x="100" y="14" fill="white" font-size="12" font-weight="bold" text-anchor="middle">-</text>
+                            
+                            <circle cx="163" cy="163" r="8" fill="#3b82f6"/>
+                            <text x="163" y="167" fill="white" font-size="12" font-weight="bold" text-anchor="middle">-</text>
+                            
+                            <circle cx="37" cy="163" r="8" fill="#3b82f6"/>
+                            <text x="37" y="167" fill="white" font-size="12" font-weight="bold" text-anchor="middle">-</text>
+                        </svg>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- Slide 5: Materi 2 - Interaksi & Hukum Coulomb -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-5">
+             <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold tracking-wide">Materi 2 / 3</span>
+                </div>
+                <h2 class="text-3xl font-bold text-blue-900 mb-6">Interaksi Muatan & Hukum Coulomb</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-full">
+                        <h3 class="text-xl font-bold mb-4 text-slate-800">Sifat Interaksi</h3>
+                        <p class="text-slate-700 mb-4">Aturan dasar listrik statis sangat sederhana:</p>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-center gap-4 bg-red-50 p-3 rounded-lg border border-red-100">
+                                <div class="flex gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">-</div>
+                                    <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">-</div>
+                                </div>
+                                <span class="text-sm font-bold text-red-700">Tolak-Menolak (Sejenis)</span>
+                            </div>
+                            <div class="flex items-center gap-4 bg-green-50 p-3 rounded-lg border border-green-100">
+                                <div class="flex gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">-</div>
+                                    <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-bold">+</div>
+                                </div>
+                                <span class="text-sm font-bold text-green-700">Tarik-Menarik (Berbeda Jenis)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-md h-full flex flex-col justify-center">
+                        <h3 class="text-xl font-bold mb-4 text-yellow-400">Hukum Coulomb</h3>
+                        <p class="text-blue-100 text-sm mb-4">Semakin dekat jarak antar muatan, semakin besar gayanya. Dirumuskan:</p>
+                        <div class="bg-blue-950 p-4 rounded-xl text-center font-mono text-2xl font-bold tracking-widest border border-blue-800 mb-4">
+                            F = k <span class="text-yellow-400">·</span> <sup class="text-sm">q₁·q₂</sup>/<sub>r²</sub>
+                        </div>
+                        <ul class="text-xs text-blue-200 space-y-1">
+                            <li><strong>F</strong> : Gaya Coulomb (Newton)</li>
+                            <li><strong>q</strong> : Besar Muatan (Coulomb)</li>
+                            <li><strong>r</strong> : Jarak antar muatan (meter)</li>
+                        </ul>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- Slide 6: Materi 3 - Fenomena Petir -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-6">
+             <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold tracking-wide">Materi 3 / 3</span>
+                </div>
+                <h2 class="text-3xl font-bold text-blue-900 mb-6">Fenomena Listrik Statis: Petir</h2>
+                
+                <div class="flex flex-col md:flex-row gap-8 items-center bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="flex-1">
+                        <p class="text-slate-700 text-lg leading-relaxed mb-4">
+                            <strong>Petir</strong> adalah contoh pelepasan (lucutan) listrik statis di alam dengan skala yang sangat besar.
+                        </p>
+                        <p class="text-slate-600 mb-4">
+                            Saat badai, partikel es dalam awan saling bergesekan. Ini menyebabkan awan bagian bawah menumpuk <strong>elektron (negatif)</strong>, sedangkan bumi di bawahnya bermuatan positif.
+                        </p>
+                        <p class="text-slate-600 mb-6">
+                            Ketika perbedaan muatan sangat besar, elektron melompat dari awan ke bumi menghasilkan kilatan cahaya dan panas. Untuk melindungi gedung tinggi, kita menggunakan <strong>Penangkal Petir</strong> (ujung logam runcing yang menyalurkan listrik ke tanah).
+                        </p>
+                    </div>
+                    <div class="w-full md:w-1/2 flex justify-center bg-slate-900 p-6 rounded-xl relative overflow-hidden">
+                        <!-- Lightning SVG Animation -->
+                        <svg width="200" height="250" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Cloud -->
+                            <path d="M50 80 Q30 80 30 60 Q30 40 50 40 Q60 20 90 20 Q120 20 130 40 Q150 40 150 60 Q150 80 130 80 Z" fill="#475569" class="animate-pulse"/>
+                            <text x="50" y="70" fill="white" font-size="20" font-weight="bold">- - - - -</text>
+                            
+                            <!-- Ground -->
+                            <rect x="10" y="220" width="180" height="20" fill="#15803d"/>
+                            <text x="50" y="215" fill="white" font-size="20" font-weight="bold">+ + + + +</text>
+                            
+                            <!-- Lightning Bolt -->
+                            <path d="M100 80 L80 140 L110 140 L90 220 L130 130 L100 130 Z" fill="#facc15" class="animate-[pulse_1s_infinite]"/>
+                            
+                            <!-- House & Rod -->
+                            <rect x="140" y="180" width="40" height="40" fill="#94a3b8"/>
+                            <polygon points="135,180 160,150 185,180" fill="#b91c1c"/>
+                            <line x1="160" y1="150" x2="160" y2="120" stroke="#cbd5e1" stroke-width="3"/> <!-- Lightning Rod -->
+                        </svg>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- Slide 7: Video Pembelajaran -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-7">
+             <div class="max-w-4xl mx-auto w-full content-area overflow-y-auto h-full flex flex-col">
+                <h2 class="text-3xl font-bold text-blue-900 mb-6 flex items-center gap-3"><i class="fab fa-youtube text-red-600"></i> Video Pembelajaran</h2>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex-1 flex flex-col mb-4">
+                    <p class="text-slate-600 mb-4">Tonton video berikut untuk melihat demonstrasi dan penjelasan lebih visual mengenai listrik statis!</p>
+                    <div class="relative w-full rounded-xl overflow-hidden shadow-inner flex-1 bg-black min-h-[300px]">
+                        <!-- YouTube Embed -->
+                        <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/qtibq5NRUmE" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- Slide 8: Simulasi Interaktif -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-8">
+             <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full">
+                <h2 class="text-3xl font-bold text-blue-900 mb-2 flex items-center gap-3"><i class="fas fa-flask text-purple-600"></i> Simulasi: Penggosokan Benda</h2>
+                <p class="text-slate-600 mb-6">Klik tombol "Gosokkan Balon" untuk melihat perpindahan elektron dari kain wol ke balon karet.</p>
+                
+                <div class="bg-white p-8 rounded-2xl shadow-md border border-slate-200 flex flex-col items-center relative overflow-hidden min-h-[400px]">
+                    
+                    <div class="flex justify-between items-end w-full max-w-2xl px-10 relative h-64 border-b-4 border-slate-200 pb-2">
+                        <!-- Kain Wol -->
+                        <div class="flex flex-col items-center relative" id="sim-kain">
+                            <div class="w-32 h-32 bg-orange-200 rounded-lg shadow-inner relative flex flex-wrap content-start p-2 gap-2" style="border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;">
+                                <!-- Initial Charges -->
+                                <span class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-pos">+</span>
+                                <span class="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-neg move-target" id="elec-1">-</span>
+                                <span class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-pos">+</span>
+                                <span class="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-neg move-target" id="elec-2">-</span>
+                                <span class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-pos">+</span>
+                                <span class="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-neg move-target" id="elec-3">-</span>
+                            </div>
+                            <span class="mt-4 font-bold text-slate-700">Kain Wol (Netral)</span>
+                        </div>
+
+                        <!-- Balon -->
+                        <div class="flex flex-col items-center relative z-10 charge-move" id="sim-balon" style="transform: translateX(0);">
+                            <div class="w-28 h-36 bg-red-400 rounded-full shadow-lg relative flex flex-wrap content-center justify-center p-2 gap-2" style="border-bottom-left-radius: 40%; border-bottom-right-radius: 40%;">
+                                 <span class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-pos">+</span>
+                                 <span class="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-neg">-</span>
+                                 <span class="w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-pos">+</span>
+                                 <span class="w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-neg">-</span>
+                            </div>
+                            <span class="mt-4 font-bold text-slate-700">Balon Karet (Netral)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 flex gap-4">
+                        <button onclick="runSimulation()" id="btn-sim" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-transform active:scale-95">
+                            Gosokkan Balon
+                        </button>
+                        <button onclick="resetSimulation()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-lg transition-transform active:scale-95">
+                            Ulangi
+                        </button>
+                    </div>
+                    
+                    <div id="sim-explanation" class="mt-6 text-center text-purple-800 font-semibold opacity-0 transition-opacity duration-500 bg-purple-100 p-4 rounded-lg">
+                        Elektron (-) berpindah dari kain wol ke balon. Balon menjadi bermuatan Negatif, Wol bermuatan Positif.
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- Slide 9: Game 1 - Drag & Drop -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-9">
+            <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-bold tracking-wide">Game Edukasi 1 / 4</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-blue-900 mb-4"><i class="fas fa-hand-pointer text-orange-500"></i> Pasangkan Muatan Benda</h2>
+                <p class="text-sm text-slate-600 mb-6">Tarik (Drag) kotak benda di sebelah kiri dan letakkan (Drop) pada hasil muatan yang benar di sebelah kanan setelah proses penggosokan.</p>
+                
+                <div class="flex flex-col md:flex-row gap-8">
+                    <!-- Draggable Items -->
+                    <div class="w-full md:w-1/3 flex flex-col gap-3" id="game1-drag-container">
+                        <div class="bg-white p-3 border-2 border-slate-200 rounded-lg shadow-sm font-semibold text-center draggable z-10" draggable="true" data-id="g1-kaca">Kaca (digosok sutra)</div>
+                        <div class="bg-white p-3 border-2 border-slate-200 rounded-lg shadow-sm font-semibold text-center draggable z-10" draggable="true" data-id="g1-plastik">Plastik (digosok wol)</div>
+                        <div class="bg-white p-3 border-2 border-slate-200 rounded-lg shadow-sm font-semibold text-center draggable z-10" draggable="true" data-id="g1-sutra">Kain Sutra (bekas kaca)</div>
+                        <div class="bg-white p-3 border-2 border-slate-200 rounded-lg shadow-sm font-semibold text-center draggable z-10" draggable="true" data-id="g1-wol">Kain Wol (bekas plastik)</div>
+                        <div class="bg-white p-3 border-2 border-slate-200 rounded-lg shadow-sm font-semibold text-center draggable z-10" draggable="true" data-id="g1-ebonit">Ebonit (digosok wol)</div>
+                    </div>
+                    
+                    <!-- Drop Zones -->
+                    <div class="w-full md:w-2/3 grid grid-cols-2 gap-4">
+                        <div class="bg-red-50 p-4 border-2 border-dashed border-red-300 rounded-xl min-h-[200px] dropzone flex flex-col" data-target="positif">
+                            <h3 class="text-center font-bold text-red-700 mb-2 border-b border-red-200 pb-2">Bermuatan Positif (+)</h3>
+                            <div class="flex-1 flex flex-col gap-2 drop-content"></div>
+                        </div>
+                        <div class="bg-blue-50 p-4 border-2 border-dashed border-blue-300 rounded-xl min-h-[200px] dropzone flex flex-col" data-target="negatif">
+                            <h3 class="text-center font-bold text-blue-700 mb-2 border-b border-blue-200 pb-2">Bermuatan Negatif (-)</h3>
+                            <div class="flex-1 flex flex-col gap-2 drop-content"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-center">
+                    <button onclick="checkGame1()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg shadow">Periksa Jawaban</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Game 2 - Drag the Words -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-10">
+            <div class="max-w-4xl mx-auto w-full content-area overflow-y-auto h-full">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-bold tracking-wide">Game Edukasi 2 / 4</span>
+                </div>
+                <h2 class="text-2xl font-bold text-blue-900 mb-2"><i class="fas fa-puzzle-piece text-orange-500"></i> Lengkapi Paragraf (Drag the Words)</h2>
+                <p class="text-sm text-slate-600 mb-6">Tarik kata di kotak kuning ke tempat yang kosong di dalam teks.</p>
+                
+                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-6 flex flex-wrap gap-3 min-h-[60px]" id="game2-word-bank">
+                    <span class="bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded shadow cursor-grab draggable-word inline-block" draggable="true" data-word="elektron">elektron</span>
+                    <span class="bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded shadow cursor-grab draggable-word inline-block" draggable="true" data-word="positif">positif</span>
+                    <span class="bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded shadow cursor-grab draggable-word inline-block" draggable="true" data-word="berbeda">berbeda</span>
+                    <span class="bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded shadow cursor-grab draggable-word inline-block" draggable="true" data-word="muatan">muatan</span>
+                    <span class="bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded shadow cursor-grab draggable-word inline-block" draggable="true" data-word="elektroskop">elektroskop</span>
+                </div>
+                
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 text-lg leading-loose text-slate-700">
+                    Listrik statis adalah kumpulan <span class="word-dropzone inline-block w-32 h-8 border-b-2 border-dashed border-slate-400 align-middle bg-slate-50 text-center text-sm font-bold pt-1" data-answer="muatan"></span> listrik dalam jumlah tertentu yang tetap. Benda yang kelebihan <span class="word-dropzone inline-block w-32 h-8 border-b-2 border-dashed border-slate-400 align-middle bg-slate-50 text-center text-sm font-bold pt-1" data-answer="elektron"></span> akan bermuatan negatif. Sedangkan benda yang kekurangan partikel tersebut akan bermuatan <span class="word-dropzone inline-block w-32 h-8 border-b-2 border-dashed border-slate-400 align-middle bg-slate-50 text-center text-sm font-bold pt-1" data-answer="positif"></span>. Gaya tarik-menarik terjadi jika jenis muatan kedua benda tersebut <span class="word-dropzone inline-block w-32 h-8 border-b-2 border-dashed border-slate-400 align-middle bg-slate-50 text-center text-sm font-bold pt-1" data-answer="berbeda"></span>. Contoh alat bantu di laboratorium untuk mendeteksi adanya muatan adalah <span class="word-dropzone inline-block w-32 h-8 border-b-2 border-dashed border-slate-400 align-middle bg-slate-50 text-center text-sm font-bold pt-1" data-answer="elektroskop"></span>.
+                </div>
+                
+                <div class="mt-6 flex justify-center">
+                    <button onclick="checkGame2()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg shadow">Periksa Paragraf</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Game 3 - Fill the words -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-11">
+            <div class="max-w-4xl mx-auto w-full content-area overflow-y-auto h-full">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-bold tracking-wide">Game Edukasi 3 / 4</span>
+                </div>
+                <h2 class="text-2xl font-bold text-blue-900 mb-2"><i class="fas fa-keyboard text-orange-500"></i> Isilah Titik-titik (Fill the words)</h2>
+                <p class="text-sm text-slate-600 mb-6">Ketikkan kata yang tepat pada kotak isian di bawah ini.</p>
+                
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 text-lg leading-loose text-slate-700">
+                    Gaya listrik antara dua muatan berbanding terbalik dengan kuadrat <input type="text" class="fill-word w-24 border-b-2 border-slate-400 focus:border-blue-500 outline-none text-center font-bold text-blue-600 px-1 mx-1 bg-transparent" data-answer="jarak"> nya. Aturan ini sangat dikenal dalam fisika sebagai Hukum <input type="text" class="fill-word w-28 border-b-2 border-slate-400 focus:border-blue-500 outline-none text-center font-bold text-blue-600 px-1 mx-1 bg-transparent" data-answer="coulomb">. Satuan Internasional (SI) untuk mengukur muatan listrik adalah <input type="text" class="fill-word w-28 border-b-2 border-slate-400 focus:border-blue-500 outline-none text-center font-bold text-blue-600 px-1 mx-1 bg-transparent" data-answer="coulomb">. Fenomena <input type="text" class="fill-word w-24 border-b-2 border-slate-400 focus:border-blue-500 outline-none text-center font-bold text-blue-600 px-1 mx-1 bg-transparent" data-answer="petir"> di langit saat badai hujan adalah contoh nyata lucutan listrik statis di alam bebas. Untuk melindungi struktur bangunan tinggi dari sambaran tersebut, manusia memasang batang logam pelindung yang disebut <input type="text" class="fill-word w-28 border-b-2 border-slate-400 focus:border-blue-500 outline-none text-center font-bold text-blue-600 px-1 mx-1 bg-transparent" data-answer="penangkal"> petir.
+                </div>
+                
+                <div class="mt-6 flex justify-center">
+                    <button onclick="checkGame3()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg shadow">Kumpulkan Jawaban</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Game 4 - Tebak Gambar -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-12">
+            <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-bold tracking-wide">Game Edukasi 4 / 4</span>
+                </div>
+                <h2 class="text-2xl font-bold text-blue-900 mb-2"><i class="fas fa-image text-orange-500"></i> Tebak Gambar</h2>
+                <p class="text-sm text-slate-600 mb-6">Pilih nama/konsep yang tepat untuk masing-masing gambar berikut.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="game4-container">
+                    <!-- Image 1 -->
+                    <div class="bg-white p-3 rounded-xl shadow border border-slate-200 flex flex-col items-center">
+                        <div class="h-24 w-full bg-blue-50 rounded flex items-center justify-center text-3xl text-blue-500 mb-3"><i class="fas fa-ruler"></i></div>
+                        <select class="game4-select w-full border border-slate-300 rounded p-1 text-sm outline-none" data-answer="Gejala Listrik Statis">
+                            <option value="">- Pilih -</option>
+                            <option value="Hukum Ohm">Hukum Ohm</option>
+                            <option value="Gejala Listrik Statis">Gejala Listrik Statis</option>
+                            <option value="Medan Magnet">Medan Magnet</option>
+                        </select>
+                    </div>
+                    <!-- Image 2 -->
+                    <div class="bg-white p-3 rounded-xl shadow border border-slate-200 flex flex-col items-center">
+                        <div class="h-24 w-full bg-slate-800 rounded flex items-center justify-center text-4xl text-yellow-400 mb-3"><i class="fas fa-bolt"></i></div>
+                        <select class="game4-select w-full border border-slate-300 rounded p-1 text-sm outline-none" data-answer="Petir">
+                            <option value="">- Pilih -</option>
+                            <option value="Sinar Matahari">Sinar Matahari</option>
+                            <option value="Petir">Petir</option>
+                            <option value="Lampu Neon">Lampu Neon</option>
+                        </select>
+                    </div>
+                    <!-- Image 3 -->
+                    <div class="bg-white p-3 rounded-xl shadow border border-slate-200 flex flex-col items-center">
+                        <div class="h-24 w-full bg-amber-50 rounded flex flex-col items-center justify-center mb-3">
+                            <div class="w-4 h-4 rounded-full bg-yellow-600"></div>
+                            <div class="w-1 h-10 bg-yellow-600"></div>
+                            <div class="w-6 h-6 border-b-2 border-l-2 border-yellow-600 transform -rotate-45 mt-[-5px]"></div>
+                        </div>
+                        <select class="game4-select w-full border border-slate-300 rounded p-1 text-sm outline-none" data-answer="Elektroskop">
+                            <option value="">- Pilih -</option>
+                            <option value="Mikroskop">Mikroskop</option>
+                            <option value="Teleskop">Teleskop</option>
+                            <option value="Elektroskop">Elektroskop</option>
+                        </select>
+                    </div>
+                    <!-- Image 4 -->
+                    <div class="bg-white p-3 rounded-xl shadow border border-slate-200 flex flex-col items-center">
+                        <div class="h-24 w-full bg-indigo-50 rounded flex items-center justify-center text-4xl text-indigo-500 mb-3"><i class="fas fa-atom"></i></div>
+                        <select class="game4-select w-full border border-slate-300 rounded p-1 text-sm outline-none" data-answer="Model Atom">
+                            <option value="">- Pilih -</option>
+                            <option value="Sel Hewan">Sel Hewan</option>
+                            <option value="Tata Surya">Tata Surya</option>
+                            <option value="Model Atom">Model Atom</option>
+                        </select>
+                    </div>
+                    <!-- Image 5 -->
+                    <div class="bg-white p-3 rounded-xl shadow border border-slate-200 flex flex-col items-center">
+                        <div class="h-24 w-full bg-gray-100 rounded flex items-center justify-center text-4xl text-gray-600 mb-3"><i class="fas fa-print"></i></div>
+                        <select class="game4-select w-full border border-slate-300 rounded p-1 text-sm outline-none" data-answer="Mesin Fotokopi">
+                            <option value="">- Pilih -</option>
+                            <option value="Mesin Fotokopi">Mesin Fotokopi</option>
+                            <option value="Oven Listrik">Oven Listrik</option>
+                            <option value="Kipas Angin">Kipas Angin</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-center">
+                    <button onclick="checkGame4()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg shadow">Tebak Semua</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Kuis Interaktif (10 Soal terpadu) -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-14 pb-20 px-2 md:px-10" id="slide-13">
+            <div class="max-w-3xl mx-auto w-full content-area overflow-y-auto h-full pt-4">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-[450px]" id="quiz-container">
+                    <!-- Quiz Header -->
+                    <div class="bg-indigo-600 text-white p-4 flex justify-between items-center">
+                        <h2 class="text-xl font-bold"><i class="fas fa-clipboard-check"></i> Uji Pemahaman</h2>
+                        <span class="bg-indigo-800 px-3 py-1 rounded-full text-sm font-bold" id="quiz-progress">Soal 1 / 10</span>
+                    </div>
+                    
+                    <!-- Quiz Content Body -->
+                    <div class="p-6 flex-1 flex flex-col justify-center" id="quiz-body">
+                        <!-- Content injected via JS -->
+                    </div>
+                    
+                    <!-- Quiz Footer (Next Button) -->
+                    <div class="bg-slate-50 p-4 border-t border-slate-200 flex justify-end hidden" id="quiz-footer">
+                        <button onclick="nextQuizQuestion()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Selanjutnya <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+                
+                <!-- Result Screen (Hidden initially) -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center hidden" id="quiz-result">
+                    <div class="w-24 h-24 mx-auto bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mb-4">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-2">Kuis Selesai!</h2>
+                    <p class="text-lg text-slate-600 mb-6">Skor Akhir Kamu:</p>
+                    <div class="text-6xl font-extrabold text-indigo-600 mb-6" id="quiz-score">100</div>
+                    <p class="text-xl font-medium text-slate-700 mb-8" id="quiz-message">Luar biasa! Kamu sangat memahami materi ini.</p>
+                    <button onclick="resetQuiz()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-8 rounded-full transition-colors inline-flex items-center gap-2">
+                        <i class="fas fa-redo"></i> Coba Lagi
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Rangkuman -->
+        <div class="slide flex-col h-full w-full bg-slate-50 pt-16 pb-20 px-4 md:px-10" id="slide-14">
+             <div class="max-w-5xl mx-auto w-full content-area overflow-y-auto h-full">
+                <h2 class="text-3xl font-bold text-teal-700 mb-8 flex items-center gap-3"><i class="fas fa-clipboard-list"></i> Rangkuman Materi</h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white border-l-4 border-teal-500 p-6 rounded-r-xl shadow-md">
+                        <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mb-4 text-xl"><i class="fas fa-atom"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">Muatan & Atom</h3>
+                        <p class="text-sm text-slate-600">Atom terdiri dari proton (+) dan elektron (-). Benda netral menjadi bermuatan jika menerima/melepas elektron melalui gosokan.</p>
+                    </div>
+                    <div class="bg-white border-l-4 border-blue-500 p-6 rounded-r-xl shadow-md">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4 text-xl"><i class="fas fa-magnet"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">Interaksi</h3>
+                        <p class="text-sm text-slate-600">Muatan <strong>Sejenis</strong> akan tolak-menolak. Muatan <strong>Berbeda Jenis</strong> akan tarik-menarik. Besar gaya dihitung dengan Hukum Coulomb.</p>
+                    </div>
+                    <div class="bg-white border-l-4 border-amber-500 p-6 rounded-r-xl shadow-md">
+                        <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-4 text-xl"><i class="fas fa-bolt"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">Penerapan</h3>
+                        <p class="text-sm text-slate-600">Petir adalah loncatan elektron raksasa akibat perbedaan muatan awan dan bumi. Diatasi dengan penangkal petir. Elektroskop untuk mendeteksi muatan.</p>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+        <!-- Slide 15: Referensi & Penutup -->
+        <div class="slide flex-col items-center justify-center h-full w-full bg-slate-900 text-white px-4 md:px-10" id="slide-15">
+             <div class="text-center max-w-2xl mx-auto">
+                <i class="fas fa-graduation-cap text-6xl text-yellow-400 mb-6 block animate-bounce"></i>
+                <h2 class="text-4xl font-bold mb-4">Selamat!</h2>
+                <p class="text-xl text-slate-300 mb-8">Kamu telah menyelesaikan modul interaktif "Listrik Statis". Teruslah belajar dan bereksplorasi dengan sains.</p>
+                
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-left mb-8">
+                    <h3 class="font-bold text-blue-300 mb-2 border-b border-slate-700 pb-2"><i class="fas fa-book mr-2"></i>Referensi Belajar:</h3>
+                    <ul class="text-sm text-slate-400 space-y-2">
+                        <li>1. Buku Siswa IPA SMP/MTs Kelas IX (Kemdikbudristek)</li>
+                        <li>2. Modul Pembelajaran Kurikulum Merdeka SMP</li>
+                        <li>3. Simulasi PhET Interactive Animations (Referensi visual)</li>
+                    </ul>
+                </div>
+                
+                <p class="text-sm text-slate-500 mb-2">Dibuat oleh:</p>
+                <p class="font-bold text-slate-200">Ayu Made Yulia Dewi Antini, S.Pd</p>
+             </div>
+        </div>
+
+    </main>
+
+    <!-- Navigation Footer -->
+    <footer class="fixed bottom-0 w-full bg-white border-t border-slate-200 p-3 z-40 hidden" id="main-footer">
+        <div class="max-w-5xl mx-auto flex justify-between items-center w-full">
+            <button onclick="prevSlide()" id="btn-prev" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
+                <i class="fas fa-chevron-left"></i> <span class="hidden md:inline">Sebelumnya</span>
+            </button>
+            
+            <!-- Progress Bar / Indicator -->
+            <div class="flex-1 px-4 md:px-8">
+                <div class="w-full bg-slate-200 rounded-full h-2 mb-1">
+                    <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" id="progress-bar" style="width: 10%"></div>
+                </div>
+                <div class="text-center text-xs font-semibold text-slate-500" id="page-indicator">Halaman 2 / 15</div>
+            </div>
+            
+            <button onclick="nextSlide()" id="btn-next" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold transition-colors disabled:opacity-50 flex items-center gap-2">
+                <span class="hidden md:inline">Selanjutnya</span> <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let currentSlideIndex = 0;
+        const totalSlides = 16; // 0 to 15
+        
+        // --- INITIALIZATION ---
+        function initApp() {
+            setupDragAndDrop();
+            initQuiz();
+            updateSlideView();
+        }
+
+        // --- UI NOTIFICATION HELPER ---
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const colorClass = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-times-circle';
+            
+            toast.className = `${colorClass} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 transition-opacity duration-300 opacity-0 transform translate-y-[-20px]`;
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span class="font-bold text-sm">${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+            }, 10);
+            
+            // Remove after 3s
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- NAVIGATION LOGIC ---
+        function goToSlide(index) {
+            if(index < 0 || index >= totalSlides) return;
+            
+            // Hide current
+            document.getElementById(`slide-${currentSlideIndex}`).classList.remove('active');
+            
+            currentSlideIndex = index;
+            
+            // Show new
+            document.getElementById(`slide-${currentSlideIndex}`).classList.add('active');
+            
+            updateSlideView();
+        }
+
+        function nextSlide() { goToSlide(currentSlideIndex + 1); }
+        function prevSlide() { goToSlide(currentSlideIndex - 1); }
+
+        function updateSlideView() {
+            const header = document.getElementById('main-header');
+            const footer = document.getElementById('main-footer');
+            
+            // Toggle Header & Footer visibility
+            if (currentSlideIndex === 0) {
+                header.classList.add('hidden');
+                footer.classList.add('hidden');
+            } else if (currentSlideIndex === 1) {
+                header.classList.remove('hidden');
+                footer.classList.add('hidden'); // Optional: hide footer on menu
+            } else {
+                header.classList.remove('hidden');
+                footer.classList.remove('hidden');
+            }
+            
+            // Update Footer Buttons & Progress
+            if(footer && !footer.classList.contains('hidden')) {
+                document.getElementById('btn-prev').disabled = currentSlideIndex <= 1; // can't go back to cover from footer usually, but let's allow it to menu (1)
+                document.getElementById('btn-next').disabled = currentSlideIndex === totalSlides - 1;
+                
+                // Progress Math (slide 2 to 15 is 14 slides)
+                let progressPercent = ((currentSlideIndex - 1) / (totalSlides - 2)) * 100;
+                if(progressPercent > 100) progressPercent = 100;
+                
+                document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+                document.getElementById('page-indicator').innerText = `Halaman ${currentSlideIndex} dari ${totalSlides-1}`;
+            }
+            
+            // Auto pause video if leaving slide 7
+            if(currentSlideIndex !== 7) {
+                let iframe = document.querySelector('iframe');
+                if(iframe) {
+                    let src = iframe.src;
+                    iframe.src = src; // Reloads iframe, stopping video
+                }
+            }
+        }
+
+        // --- FULLSCREEN LOGIC ---
+        function toggleFullscreen() {
+            try {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        showNotification(`Error layar penuh: ${err.message}`, 'error');
+                    });
+                    document.getElementById('fullscreen-icon').classList.replace('fa-expand', 'fa-compress');
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                        document.getElementById('fullscreen-icon').classList.replace('fa-compress', 'fa-expand');
+                    }
+                }
+            } catch(e) {
+                showNotification("Fitur fullscreen tidak didukung di frame ini.", "error");
+            }
+        }
+
+        // --- SIMULATION LOGIC (Slide 8) ---
+        let simDone = false;
+        function runSimulation() {
+            if(simDone) return;
+            const btn = document.getElementById('btn-sim');
+            const balon = document.getElementById('sim-balon');
+            const electrons = document.querySelectorAll('.move-target');
+            const explanation = document.getElementById('sim-explanation');
+            
+            // Disable button
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            
+            // 1. Move balloon to the sweater
+            balon.style.transform = 'translateX(-120px) rotate(-15deg)';
+            
+            setTimeout(() => {
+                // 2. Transfer electrons
+                electrons.forEach(el => {
+                    el.style.position = 'absolute';
+                    // Move visual element simply by appending it into balloon div visually or just changing color
+                    // A simpler way: Hide them on sweater, spawn them on balloon
+                    el.style.opacity = '0';
+                });
+                
+                // Add extra minus to balloon
+                const balonDiv = balon.querySelector('div');
+                for(let i=0; i<3; i++) {
+                    let min = document.createElement('span');
+                    min.className = "w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold sim-neg extra-neg";
+                    min.innerText = "-";
+                    balonDiv.appendChild(min);
+                }
+                
+                // 3. Move balloon back
+                setTimeout(() => {
+                    balon.style.transform = 'translateX(0) rotate(0deg)';
+                    explanation.classList.remove('opacity-0');
+                    simDone = true;
+                }, 1000);
+                
+            }, 1000);
+        }
+        
+        function resetSimulation() {
+            simDone = false;
+            const btn = document.getElementById('btn-sim');
+            const balon = document.getElementById('sim-balon');
+            const electrons = document.querySelectorAll('.move-target');
+            const explanation = document.getElementById('sim-explanation');
+            
+            btn.disabled = false;
+            btn.classList.remove('opacity-50');
+            balon.style.transform = 'translateX(0)';
+            explanation.classList.add('opacity-0');
+            
+            electrons.forEach(el => { el.style.opacity = '1'; });
+            
+            document.querySelectorAll('.extra-neg').forEach(el => el.remove());
+        }
+
+        // --- GAME LOGIC ---
+        
+        // Setup Drag & Drop Event Listeners
+        function setupDragAndDrop() {
+            // Setup generic draggables
+            document.querySelectorAll('.draggable, .draggable-word').forEach(draggable => {
+                draggable.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', e.target.getAttribute('data-id') || e.target.getAttribute('data-word'));
+                    e.target.classList.add('opacity-50');
+                });
+                draggable.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('opacity-50');
+                });
+            });
+
+            // Setup Game 1 Dropzones
+            document.querySelectorAll('#slide-9 .dropzone').forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', e => {
+                    zone.classList.remove('drag-over');
+                });
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const id = e.dataTransfer.getData('text/plain');
+                    const draggedElement = document.querySelector(`[data-id="${id}"]`);
+                    if (draggedElement) {
+                        // Move to drop content div inside dropzone
+                        zone.querySelector('.drop-content').appendChild(draggedElement);
+                        draggedElement.className = "bg-white p-2 rounded shadow text-sm font-semibold text-center mt-1";
+                    }
+                });
+            });
+
+            // Setup Game 2 Dropzones (Word blanks)
+            document.querySelectorAll('.word-dropzone').forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    if(!zone.hasChildNodes() || zone.innerText === "") {
+                        zone.classList.replace('bg-slate-50', 'bg-blue-100');
+                    }
+                });
+                zone.addEventListener('dragleave', e => {
+                    zone.classList.replace('bg-blue-100', 'bg-slate-50');
+                });
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.replace('bg-blue-100', 'bg-slate-50');
+                    const word = e.dataTransfer.getData('text/plain');
+                    const draggedWord = document.querySelector(`[data-word="${word}"]`);
+                    
+                    if (draggedWord && (zone.innerText === "" || zone.children.length === 0)) {
+                        zone.innerText = word;
+                        zone.classList.add('text-blue-700');
+                        draggedWord.style.display = 'none'; // hide from bank
+                        
+                        // Add click to remove
+                        zone.onclick = function() {
+                            draggedWord.style.display = 'inline-block';
+                            zone.innerText = "";
+                            zone.onclick = null;
+                        };
+                    }
+                });
+            });
+        }
+
+        // Checking Game 1 (Drag objects)
+        const game1Answers = {
+            'g1-kaca': 'positif', 'g1-plastik': 'negatif', 'g1-sutra': 'negatif', 'g1-wol': 'positif', 'g1-ebonit': 'negatif'
+        };
+        function checkGame1() {
+            let correctCount = 0;
+            document.querySelectorAll('#slide-9 .dropzone').forEach(zone => {
+                const target = zone.getAttribute('data-target');
+                const items = zone.querySelectorAll('.drop-content > div');
+                items.forEach(item => {
+                    const id = item.getAttribute('data-id');
+                    if(game1Answers[id] === target) {
+                        correctCount++;
+                        item.classList.add('border-2', 'border-green-500');
+                    } else {
+                        item.classList.add('border-2', 'border-red-500');
+                    }
+                });
+            });
+            
+            if(correctCount === 5) showNotification("Luar biasa! Semua benar.", "success");
+            else showNotification(`Kamu menjawab ${correctCount} dari 5 dengan benar.`, "error");
+        }
+
+        // Checking Game 2 (Drag words)
+        function checkGame2() {
+            let correct = 0;
+            document.querySelectorAll('.word-dropzone').forEach(zone => {
+                const answer = zone.getAttribute('data-answer');
+                if(zone.innerText.trim().toLowerCase() === answer) {
+                    correct++;
+                    zone.classList.add('border-green-500', 'text-green-600');
+                    zone.classList.remove('border-slate-400');
+                } else {
+                    zone.classList.add('border-red-500', 'text-red-600');
+                    zone.classList.remove('border-slate-400', 'text-blue-700');
+                }
+            });
+            if(correct === 5) showNotification("Hebat! Paragraf lengkap dan benar.", "success");
+            else showNotification(`Ada ${5 - correct} kata yang masih salah/kosong.`, "error");
+        }
+
+        // Checking Game 3 (Fill words)
+        function checkGame3() {
+            let correct = 0;
+            document.querySelectorAll('.fill-word').forEach(input => {
+                const answer = input.getAttribute('data-answer');
+                if(input.value.trim().toLowerCase() === answer) {
+                    correct++;
+                    input.classList.add('border-green-500', 'text-green-600');
+                } else {
+                    input.classList.add('border-red-500', 'text-red-600');
+                }
+            });
+            if(correct === 5) showNotification("Sempurna! Isianmu benar semua.", "success");
+            else showNotification(`Kamu menjawab ${correct} dari 5 dengan benar.`, "error");
+        }
+
+        // Checking Game 4 (Tebak Gambar)
+        function checkGame4() {
+            let correct = 0;
+            document.querySelectorAll('.game4-select').forEach(select => {
+                if(select.value === select.getAttribute('data-answer')) {
+                    correct++;
+                    select.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                } else {
+                    select.classList.add('border-red-500', 'bg-red-50');
+                }
+            });
+            if(correct === 5) showNotification("Tebakanmu jitu! Semua gambar benar.", "success");
+            else showNotification(`Kamu menebak ${correct} dari 5 gambar.`, "error");
+        }
+
+        // --- QUIZ LOGIC ---
+        const quizData = [
+            // Multiple Choice (1-5)
+            { type: 'mcq', q: 'Benda dikatakan bermuatan positif jika...', options: ['Menerima elektron', 'Kekurangan elektron', 'Kelebihan proton', 'Menerima neutron'], answer: 1, explanation: 'Benda bermuatan positif karena ia melepaskan/kekurangan elektron (yang bermuatan negatif).' },
+            { type: 'mcq', q: 'Jika dua buah muatan yang sejenis didekatkan, maka yang terjadi adalah...', options: ['Tolak menolak', 'Tarik menarik', 'Tidak ada reaksi', 'Meledak'], answer: 0, explanation: 'Sesuai sifat muatan, muatan sejenis (+ dan +, atau - dan -) akan tolak menolak.' },
+            { type: 'mcq', q: 'Alat yang digunakan untuk mengetahui apakah suatu benda bermuatan listrik atau tidak adalah...', options: ['Osiloskop', 'Mikroskop', 'Elektroskop', 'Teleskop'], answer: 2, explanation: 'Elektroskop adalah alat deteksi muatan statis sederhana.' },
+            { type: 'mcq', q: 'Berdasarkan Hukum Coulomb, jika jarak antar dua muatan diperbesar 2 kali, maka gaya listriknya menjadi...', options: ['2 kali lebih besar', '4 kali lebih besar', 'Setengah kali semula', 'Seperempat kali semula'], answer: 3, explanation: 'F berbanding terbalik dengan kuadrat jarak (r²). Jika r menjadi 2r, maka (2r)² = 4r², sehingga gaya menjadi 1/4 nya.' },
+            { type: 'mcq', q: 'Penggaris plastik yang digosokkan pada rambut akan bermuatan negatif karena...', options: ['Elektron plastik pindah ke rambut', 'Elektron rambut pindah ke plastik', 'Proton plastik pindah ke rambut', 'Proton rambut pindah ke plastik'], answer: 1, explanation: 'Elektron (negatif) dari rambut pindah ke penggaris plastik, sehingga plastik kelebihan elektron.' },
+            // True/False (6-7)
+            { type: 'tf', q: 'Kilat/Petir adalah salah satu contoh fenomena listrik statis dalam skala besar.', answer: true, explanation: 'Benar, petir adalah pelepasan (lucutan) muatan listrik statis dari awan ke awan atau awan ke bumi.' },
+            { type: 'tf', q: 'Neutron adalah partikel atom yang bermuatan negatif.', answer: false, explanation: 'Salah, Neutron tidak bermuatan (netral). Yang bermuatan negatif adalah Elektron.' },
+            // Mini Drag&Drop for Quiz (8-10) implemented as matching options for simplicity in this engine
+            { type: 'match', q: 'Pasangkan benda dengan muatan akhirnya setelah digosok.', pair: { 'Kaca (digosok sutra)': 'Positif', 'Plastik (digosok wol)': 'Negatif' }, answer: 'Positif', explanation: 'Kaca melepas elektron ke sutra sehingga positif.' }, // Simplified matching
+            { type: 'mcq', q: '[Soal Khusus] Untuk melindungi gedung tinggi dari petir, digunakan benda berujung runcing yang disebut...', options: ['Penangkal Petir', 'Antena TV', 'Konduktor Panas', 'Kabel Tembaga'], answer: 0, explanation: 'Penangkal petir menyalurkan elektron langsung ke tanah (grounding).' },
+            { type: 'tf', q: 'Gaya Coulomb akan semakin besar jika muatan kedua benda semakin besar.', answer: true, explanation: 'Benar, F sebanding dengan besar muatan q1 dan q2.' }
+        ];
+
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+
+        function initQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            quizAnswered = false;
+            const qData = quizData[currentQuizIndex];
+            const body = document.getElementById('quiz-body');
+            const footer = document.getElementById('quiz-footer');
+            
+            document.getElementById('quiz-progress').innerText = `Soal ${currentQuizIndex + 1} / ${quizData.length}`;
+            footer.classList.add('hidden'); // hide next button
+            
+            let html = `<h3 class="text-xl font-bold text-slate-800 mb-6">${currentQuizIndex + 1}. ${qData.q}</h3>`;
+            
+            if (qData.type === 'mcq') {
+                html += `<div class="space-y-3">`;
+                qData.options.forEach((opt, idx) => {
+                    html += `<button onclick="answerQuiz(${idx}, this)" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 font-medium text-slate-700 transition-colors quiz-opt">${['A','B','C','D'][idx]}. ${opt}</button>`;
+                });
+                html += `</div>`;
+            } else if (qData.type === 'tf') {
+                html += `<div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mt-4">
+                    <button onclick="answerQuiz(true, this)" class="p-6 rounded-xl border border-slate-200 hover:border-green-500 hover:bg-green-50 font-bold text-xl text-green-700 transition-colors quiz-opt">BENAR</button>
+                    <button onclick="answerQuiz(false, this)" class="p-6 rounded-xl border border-slate-200 hover:border-red-500 hover:bg-red-50 font-bold text-xl text-red-700 transition-colors quiz-opt">SALAH</button>
+                </div>`;
+            } else if (qData.type === 'match') {
+                // Simplified matching as binary choice for the specific pair mentioned in question
+                html += `<div class="grid grid-cols-2 gap-4 mt-4">
+                    <button onclick="answerQuiz('Positif', this)" class="p-4 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50 font-bold text-blue-700 transition-colors quiz-opt">Positif (+)</button>
+                    <button onclick="answerQuiz('Negatif', this)" class="p-4 rounded-xl border border-slate-200 hover:border-red-500 hover:bg-red-50 font-bold text-red-700 transition-colors quiz-opt">Negatif (-)</button>
+                </div>`;
+            }
+            
+            // Explanation container
+            html += `<div id="quiz-explanation" class="mt-6 p-4 rounded-lg hidden text-sm font-medium"></div>`;
+            
+            body.innerHTML = html;
+        }
+
+        function answerQuiz(selectedAnswer, btnElement) {
+            if(quizAnswered) return;
+            quizAnswered = true;
+            
+            const qData = quizData[currentQuizIndex];
+            const isCorrect = selectedAnswer === qData.answer;
+            const explanationBox = document.getElementById('quiz-explanation');
+            
+            // Style the clicked button
+            if (isCorrect) {
+                btnElement.classList.remove('border-slate-200', 'hover:border-indigo-500');
+                btnElement.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-md');
+                quizScore += 10;
+                explanationBox.classList.add('bg-green-100', 'text-green-800');
+                explanationBox.innerHTML = `<strong>Jawaban Benar!</strong> <br> ${qData.explanation}`;
+            } else {
+                btnElement.classList.remove('border-slate-200', 'hover:border-indigo-500');
+                btnElement.classList.add('bg-red-500', 'text-white', 'border-red-600', 'shadow-md');
+                explanationBox.classList.add('bg-red-100', 'text-red-800');
+                explanationBox.innerHTML = `<strong>Jawaban Salah.</strong> <br> ${qData.explanation}`;
+                
+                // Highlight correct answer if MCQ
+                if(qData.type === 'mcq') {
+                    const opts = document.querySelectorAll('.quiz-opt');
+                    opts[qData.answer].classList.add('border-2', 'border-green-500', 'bg-green-50');
+                }
+            }
+            
+            explanationBox.classList.remove('hidden');
+            document.getElementById('quiz-footer').classList.remove('hidden');
+            
+            // Disable all options
+            document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < quizData.length) {
+                renderQuizQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            const resultBox = document.getElementById('quiz-result');
+            resultBox.classList.remove('hidden');
+            
+            document.getElementById('quiz-score').innerText = quizScore;
+            const msg = document.getElementById('quiz-message');
+            
+            if (quizScore >= 80) msg.innerText = "Luar biasa! Pemahamanmu tentang Listrik Statis sangat baik.";
+            else if (quizScore >= 50) msg.innerText = "Cukup baik! Pelajari kembali beberapa materi yang masih ragu.";
+            else msg.innerText = "Jangan menyerah! Coba baca kembali materi dan kerjakan ulang kuisnya.";
+        }
+        
+        function resetQuiz() {
+            initQuiz();
+        }
+
+    </script>
+</body>
+</html>
